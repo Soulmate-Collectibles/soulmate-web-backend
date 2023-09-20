@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Drop } from '../drops/drop.entity';
+import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -7,4 +8,7 @@ export class User {
 
   @Column()
   nonce: string;
+
+  @OneToMany(() => Drop, (drop) => drop.creator)
+  drops: Drop[];
 }
