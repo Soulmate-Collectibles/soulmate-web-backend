@@ -4,6 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { DropsModule } from './drops/drops.module';
+import { User } from './users/user.entity';
+import { Drop } from './drops/drop.entity';
+import { Mintlink } from './drops/mintlink.entity';
 
 @Module({
   imports: [
@@ -15,6 +18,7 @@ import { DropsModule } from './drops/drops.module';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         type: 'postgres',
+        entities: [User, Drop, Mintlink],
         autoLoadEntities: true,
         synchronize: true,
         host: configService.get('DB_HOST'),
