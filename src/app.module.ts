@@ -7,6 +7,7 @@ import { DropsModule } from './drops/drops.module';
 import { User } from './users/user.entity';
 import { Drop } from './drops/drop.entity';
 import { Mintlink } from './drops/mintlink.entity';
+import { MintlinkService } from './drops/mintlink.service';
 
 @Module({
   imports: [
@@ -18,7 +19,6 @@ import { Mintlink } from './drops/mintlink.entity';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         type: 'postgres',
-        entities: [User, Drop, Mintlink],
         autoLoadEntities: true,
         synchronize: true,
         host: configService.get('DB_HOST'),
@@ -32,5 +32,6 @@ import { Mintlink } from './drops/mintlink.entity';
     UsersModule,
     DropsModule,
   ],
+  providers: [MintlinkService],
 })
 export class AppModule {}

@@ -29,7 +29,7 @@ export class UsersService {
     const { search } = filterDto;
     const query = this.usersRepository.createQueryBuilder('user');
     if (search) {
-      query.where('(LOWER(user.nonce) LIKE LOWER(:search))', {
+      query.where('user.nonce LIKE :search', {
         search: `%${search}%`,
       });
     }
@@ -41,11 +41,19 @@ export class UsersService {
   }
 
   async getUserByAddress(userAddressDto: UserAddressDto): Promise<User> {
-    const found = await this.usersRepository.findOneBy(userAddressDto);
+    const { address } = userAddressDto;
+    const found = await this.usersRepository.findOne({
+      where: {
+        address,
+      },
+      relations: {
+        drops: {
+          mintlink: true,
+        },
+      },
+    });
     if (!found) {
-      throw new NotFoundException(
-        `User with address ${userAddressDto.address} not found.`,
-      );
+      throw new NotFoundException(`User with address ${address} not found.`);
     }
     return found;
   }
