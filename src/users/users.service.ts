@@ -40,7 +40,7 @@ export class UsersService {
     }
   }
 
-  async getUserByAddress(userAddressDto: UserAddressDto): Promise<User> {
+  async getFullUserByAddress(userAddressDto: UserAddressDto): Promise<User> {
     const { address } = userAddressDto;
     const found = await this.usersRepository.findOne({
       where: {
@@ -54,6 +54,18 @@ export class UsersService {
     });
     if (!found) {
       throw new NotFoundException(`User with address ${address} not found.`);
+    }
+    return found;
+  }
+
+  async getPartialUserByAddress(userAddress: string): Promise<User> {
+    const found = await this.usersRepository.findOneBy({
+      address: userAddress,
+    });
+    if (!found) {
+      throw new NotFoundException(
+        `User with address ${userAddress} not found.`,
+      );
     }
     return found;
   }

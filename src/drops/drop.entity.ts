@@ -14,20 +14,23 @@ export class Drop {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ length: 30 })
   title: string;
 
-  @Column()
+  @Column({ length: 300 })
   description: string;
 
   @Column()
   image: string;
 
   @Column()
-  startDate: number;
+  startDate: Date;
 
   @Column()
-  endDate: number;
+  endDate: Date;
+
+  @Column()
+  totalAmount: number;
 
   @OneToOne(() => Mintlink)
   @JoinColumn()

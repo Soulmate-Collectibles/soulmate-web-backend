@@ -4,10 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { DropsModule } from './drops/drops.module';
-import { User } from './users/user.entity';
-import { Drop } from './drops/drop.entity';
-import { Mintlink } from './drops/mintlink.entity';
-import { MintlinkService } from './drops/mintlink.service';
 
 @Module({
   imports: [
@@ -32,6 +28,5 @@ import { MintlinkService } from './drops/mintlink.service';
     UsersModule,
     DropsModule,
   ],
-  providers: [MintlinkService],
 })
 export class AppModule {}

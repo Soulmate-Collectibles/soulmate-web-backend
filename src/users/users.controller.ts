@@ -28,7 +28,7 @@ export class UsersController {
 
   @Get('/:address')
   getUserByAddress(@Param() userAddressDto: UserAddressDto): Promise<User> {
-    return this.usersService.getUserByAddress(userAddressDto);
+    return this.usersService.getFullUserByAddress(userAddressDto);
   }
 
   @Delete('/:address')

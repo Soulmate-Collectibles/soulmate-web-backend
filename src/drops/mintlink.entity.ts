@@ -6,7 +6,7 @@ export class Mintlink {
   id: string;
 
   @Column()
-  expiresAt: number;
+  expiresAt: Date;
 
   @Column()
   remainingUses: number;
