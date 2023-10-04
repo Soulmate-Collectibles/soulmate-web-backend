@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
 import { DropsService } from './drops.service';
 import { CreateDropDto } from './dto/create-drop.dto';
 import { DropIdDto } from './dto/drop-id.dto';
@@ -19,5 +19,10 @@ export class DropsController {
     @Body() updateDropDto: UpdateDropDto,
   ) {
     return this.dropsService.updateDrop(dropIdDto, updateDropDto);
+  }
+
+  @Delete('/:id')
+  deleteDrop(@Param() dropIdDto: DropIdDto): Promise<void> {
+    return this.dropsService.deleteDrop(dropIdDto);
   }
 }

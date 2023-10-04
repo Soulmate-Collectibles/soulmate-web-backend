@@ -83,9 +83,7 @@ export class DropsService {
       dropIdDto,
     );
     if (rowsAffected === 0) {
-      throw new NotFoundException(
-        `Drop with address ${dropIdDto.id} not found.`,
-      );
+      throw new NotFoundException(`Drop with id ${dropIdDto.id} not found.`);
     }
   }
 }
