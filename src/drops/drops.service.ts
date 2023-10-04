@@ -77,4 +77,15 @@ export class DropsService {
     await this.dropsRepository.save(drop);
     return drop;
   }
+
+  async deleteDrop(dropIdDto: DropIdDto): Promise<void> {
+    const { affected: rowsAffected } = await this.dropsRepository.delete(
+      dropIdDto,
+    );
+    if (rowsAffected === 0) {
+      throw new NotFoundException(
+        `Drop with address ${dropIdDto.id} not found.`,
+      );
+    }
+  }
 }
