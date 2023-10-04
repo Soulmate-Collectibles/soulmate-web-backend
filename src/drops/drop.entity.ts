@@ -32,7 +32,7 @@ export class Drop {
   @Column()
   totalAmount: number;
 
-  @OneToOne(() => Mintlink)
+  @OneToOne(() => Mintlink, { cascade: true })
   @JoinColumn()
   mintlink: Mintlink;
 
