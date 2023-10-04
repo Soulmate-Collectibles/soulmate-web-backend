@@ -79,11 +79,9 @@ export class DropsService {
   }
 
   async deleteDrop(dropIdDto: DropIdDto): Promise<void> {
-    const { affected: rowsAffected } = await this.dropsRepository.delete(
-      dropIdDto,
-    );
-    if (rowsAffected === 0) {
-      throw new NotFoundException(`Drop with id ${dropIdDto.id} not found.`);
-    }
+    const { id } = dropIdDto;
+    const drop = await this.getFullDropById(id);
+    await this.dropsRepository.delete(id);
+    await this.mintlinksService.deleteMintlink(drop.mintlink.id);
   }
 }
