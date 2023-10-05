@@ -5,12 +5,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Drop } from './drop.entity';
-import { Repository } from 'typeorm';
+import { FindOperator, Repository } from 'typeorm';
 import { CreateDropDto } from './dto/create-drop.dto';
 import { MintlinkService } from './mintlinks.service';
 import { UsersService } from 'src/users/users.service';
 import { DropIdDto } from './dto/drop-id.dto';
 import { UpdateDropDto } from './dto/update-drop.dto';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class DropsService {
@@ -78,10 +79,23 @@ export class DropsService {
     return drop;
   }
 
-  async deleteDrop(dropIdDto: DropIdDto): Promise<void> {
+  async deleteDropById(dropIdDto: DropIdDto): Promise<void> {
     const { id } = dropIdDto;
     const drop = await this.getFullDropById(id);
     await this.dropsRepository.delete(id);
     await this.mintlinksService.deleteMintlink(drop.mintlink.id);
+  }
+
+  async deleteDropsByCreatorAddress(address: string): Promise<void> {
+    const result = await this.dropsRepository
+      .createQueryBuilder('drops')
+      .delete()
+      .from(Drop)
+      .where('creatorAddress = :address', { address })
+      .execute();
+    console.log(result);
+    // const drop = await this.getFullDropById(id);
+    // await this.dropsRepository.delete(id);
+    // await this.mintlinksService.deleteMintlink(drop.mintlink.id);
   }
 }

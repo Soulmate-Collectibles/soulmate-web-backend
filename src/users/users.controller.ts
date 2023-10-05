@@ -2,6 +2,7 @@ import { Controller, Delete, Get, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserAddressDto } from './dto/user-address.dto';
 import { User } from './user.entity';
+import { DropsService } from 'src/drops/drops.service';
 
 @Controller('users')
 export class UsersController {
@@ -9,11 +10,15 @@ export class UsersController {
 
   @Get('/:address')
   getUserByAddress(@Param() userAddressDto: UserAddressDto): Promise<User> {
-    return this.usersService.getFullUserByAddress(userAddressDto);
+    const { address } = userAddressDto;
+    return this.usersService.getFullUserByAddress(address);
   }
 
-  @Delete('/:address')
-  deleteUser(@Param() userAddressDto: UserAddressDto): Promise<void> {
-    return this.usersService.deleteUser(userAddressDto);
-  }
+  // @Delete('/:address')
+  // deleteUser(@Param() userAddressDto: UserAddressDto): Promise<void> {
+  //   const { address } = userAddressDto;
+  //   // this.usersService.deleteUser(address);
+  //   this.dropsService.deleteDropsByCreatorAddress(address);
+  //   return;
+  // }
 }

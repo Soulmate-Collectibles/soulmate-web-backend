@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { randomBytes } from 'crypto';
-import { UserAddressDto } from '../users/dto/user-address.dto';
 import { User } from '../users/user.entity';
 import { Repository } from 'typeorm';
 
@@ -11,13 +14,25 @@ export class AuthService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
 
-  async createUser(userAddressDto: UserAddressDto): Promise<User> {
-    const user = this.usersRepository.create({
-      ...userAddressDto,
-      nonce: this.generateNonce(),
-      drops: [],
-    });
-    return await this.usersRepository.save(user);
+  async createUser(address: string): Promise<void> {
+    try {
+      await this.usersRepository
+        .createQueryBuilder()
+        .insert()
+        .into(User)
+        .values({
+          address,
+          nonce: this.generateNonce(),
+        })
+        .execute();
+      return;
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException('Address already exists');
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
   }
 
   generateNonce(): string {

@@ -11,5 +11,6 @@ import { Mintlink } from './mintlink.entity';
   imports: [TypeOrmModule.forFeature([Drop, Mintlink]), UsersModule],
   controllers: [DropsController],
   providers: [DropsService, MintlinkService],
+  exports: [DropsService],
 })
 export class DropsModule {}
