@@ -1,13 +1,14 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Drop } from './drop.entity';
 import { FindOperator, Repository } from 'typeorm';
 import { CreateDropDto } from './dto/create-drop.dto';
-import { MintlinkService } from './mintlinks.service';
+import { MintlinksService } from './mintlinks.service';
 import { UsersService } from 'src/users/users.service';
 import { DropIdDto } from './dto/drop-id.dto';
 import { UpdateDropDto } from './dto/update-drop.dto';
@@ -17,29 +18,61 @@ import { User } from 'src/users/user.entity';
 export class DropsService {
   constructor(
     @InjectRepository(Drop) private readonly dropsRepository: Repository<Drop>,
-    private readonly mintlinksService: MintlinkService,
+    private readonly mintlinksService: MintlinksService,
     private readonly usersService: UsersService,
   ) {}
 
-  async createDrop(createDropDto: CreateDropDto) {
-    const { endDate, totalAmount, creatorAddress } = createDropDto;
-    const creator = await this.usersService.getPartialUserByAddress(
-      creatorAddress,
-    );
-    delete createDropDto.creatorAddress;
+  async create(
+    title: string,
+    description: string,
+    image: string,
+    startDate: Date,
+    endDate: Date,
+    totalAmount: number,
+    creatorAddress: string,
+  ) {
+    const creator = await this.usersService.getOneByAddress(creatorAddress);
     const expiryDate = new Date(endDate);
     expiryDate.setMonth(expiryDate.getMonth() + 1);
-    const mintlink = await this.mintlinksService.createMintlink(
+    const mintlink = await this.mintlinksService.create(
       expiryDate,
       totalAmount,
     );
-    const drop = this.dropsRepository.create({
-      ...createDropDto,
-      mintlink,
-      creator,
-    });
-    return await this.dropsRepository.save(drop);
+    await this.dropsRepository
+      .createQueryBuilder()
+      .insert()
+      .into(Drop)
+      .values({
+        title,
+        description,
+        image,
+        startDate,
+        endDate,
+        totalAmount,
+        creator,
+        mintlink,
+      })
+      .execute();
+    return;
   }
+
+  // const { endDate, totalAmount, creatorAddress } = createDropDto;
+  // const creator = await this.usersService.getPartialUserByAddress(
+  //   creatorAddress,
+  // );
+  // delete createDropDto.creatorAddress;
+  // const expiryDate = new Date(endDate);
+  // expiryDate.setMonth(expiryDate.getMonth() + 1);
+  // const mintlink = await this.mintlinksService.createMintlink(
+  //   expiryDate,
+  //   totalAmount,
+  // );
+  // const drop = this.dropsRepository.create({
+  //   ...createDropDto,
+  //   mintlink,
+  //   creator,
+  // });
+  // return await this.dropsRepository.save(drop);
 
   async getFullDropById(dropId: string): Promise<Drop> {
     const found = await this.dropsRepository.findOne({

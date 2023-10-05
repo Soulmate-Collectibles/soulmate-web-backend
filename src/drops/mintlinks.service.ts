@@ -4,20 +4,17 @@ import { Mintlink } from './mintlink.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class MintlinkService {
+export class MintlinksService {
   constructor(
     @InjectRepository(Mintlink)
     private readonly mintlinksRepository: Repository<Mintlink>,
   ) {}
 
-  async createMintlink(
-    expiresAt: Date,
-    remainingUses: number,
-  ): Promise<Mintlink> {
-    const mintlink = {
+  async create(expiresAt: Date, remainingUses: number): Promise<Mintlink> {
+    const mintlink = this.mintlinksRepository.create({
       expiresAt,
       remainingUses,
-    };
+    });
     return await this.mintlinksRepository.save(mintlink);
   }
 

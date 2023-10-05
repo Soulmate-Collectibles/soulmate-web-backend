@@ -9,7 +9,6 @@ export class AuthController {
   @Post('/signup')
   signUp(@Body() createUserDto: UserAddressDto): Promise<void> {
     const { address } = createUserDto;
-    this.authService.createUser(address);
-    return;
+    return this.authService.createUser(address);
   }
 }

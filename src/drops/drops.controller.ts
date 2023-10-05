@@ -4,26 +4,44 @@ import { CreateDropDto } from './dto/create-drop.dto';
 import { DropIdDto } from './dto/drop-id.dto';
 import { UpdateDropDto } from './dto/update-drop.dto';
 import { UserAddressDto } from '../users/dto/user-address.dto';
+import { MintlinksService } from './mintlinks.service';
 
 @Controller('drops')
 export class DropsController {
-  constructor(private readonly dropsService: DropsService) {}
+  constructor(
+    private readonly dropsService: DropsService,
+    private readonly mintlinksService: MintlinksService,
+  ) {}
 
   @Post()
-  createDrop(@Body() createDropDto: CreateDropDto) {
-    return this.dropsService.createDrop(createDropDto);
+  create(@Body() createDropDto: CreateDropDto) {
+    const {
+      title,
+      description,
+      image,
+      startDate,
+      endDate,
+      totalAmount,
+      creatorAddress,
+    } = createDropDto;
+    return this.dropsService.create(
+      title,
+      description,
+      image,
+      startDate,
+      endDate,
+      totalAmount,
+      creatorAddress,
+    );
   }
 
   @Patch('/:id')
-  updateDrop(
-    @Param() dropIdDto: DropIdDto,
-    @Body() updateDropDto: UpdateDropDto,
-  ) {
+  update(@Param() dropIdDto: DropIdDto, @Body() updateDropDto: UpdateDropDto) {
     return this.dropsService.updateDrop(dropIdDto, updateDropDto);
   }
 
   @Delete('/:address')
-  deleteUser(@Param() userAddressDto: UserAddressDto): Promise<void> {
+  delete(@Param() userAddressDto: UserAddressDto): Promise<void> {
     const { address } = userAddressDto;
     // this.usersService.deleteUser(address);
     this.dropsService.deleteDropsByCreatorAddress(address);

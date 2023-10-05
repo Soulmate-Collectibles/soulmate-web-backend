@@ -9,16 +9,14 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('/:address')
-  getUserByAddress(@Param() userAddressDto: UserAddressDto): Promise<User> {
+  getOneByAddress(@Param() userAddressDto: UserAddressDto): Promise<User> {
     const { address } = userAddressDto;
-    return this.usersService.getFullUserByAddress(address);
+    return this.usersService.getOneByAddress(address);
   }
 
-  // @Delete('/:address')
-  // deleteUser(@Param() userAddressDto: UserAddressDto): Promise<void> {
-  //   const { address } = userAddressDto;
-  //   // this.usersService.deleteUser(address);
-  //   this.dropsService.deleteDropsByCreatorAddress(address);
-  //   return;
-  // }
+  @Delete('/:address')
+  delete(@Param() userAddressDto: UserAddressDto): Promise<void> {
+    const { address } = userAddressDto;
+    return this.usersService.delete(address);
+  }
 }

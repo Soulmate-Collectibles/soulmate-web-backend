@@ -1,7 +1,4 @@
 import {
-  AfterInsert,
-  AfterRemove,
-  AfterUpdate,
   Column,
   Entity,
   JoinColumn,
@@ -39,21 +36,6 @@ export class Drop {
   @JoinColumn()
   mintlink: Mintlink;
 
-  @ManyToOne(() => User, (user) => user.drops, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.drops)
   creator: User;
-
-  @AfterInsert()
-  logInsert() {
-    console.log(`Inserted drop with id ${this.id}`);
-  }
-
-  @AfterUpdate()
-  logUpdate() {
-    console.log(`Updated drop with id ${this.id}`);
-  }
-
-  @AfterRemove()
-  logRemove() {
-    console.log(`Removed drop with id ${this.id}`);
-  }
 }

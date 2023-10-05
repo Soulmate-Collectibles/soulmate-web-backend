@@ -9,21 +9,16 @@ export class UsersService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
 
-  async getFullUserByAddress(address: string): Promise<User> {
-    const found = await this.usersRepository.findOne({
-      where: {
-        address,
-      },
-      relations: {
-        drops: {
-          mintlink: true,
-        },
-      },
-    });
-    if (!found) {
-      throw new NotFoundException(`User with address ${address} not found.`);
+  async getOneByAddress(address: string): Promise<User> {
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.drops', 'drop')
+      .where('user.address = :address', { address })
+      .getOne();
+    if (!user) {
+      throw new NotFoundException(`User with address ${address} not found`);
     }
-    return found;
+    return user;
   }
 
   async getPartialUserByAddress(address: string): Promise<User> {
@@ -36,12 +31,16 @@ export class UsersService {
     return found;
   }
 
-  async deleteUser(address: string): Promise<void> {
-    const { affected: rowsAffected } = await this.usersRepository.delete(
-      address,
-    );
-    if (rowsAffected === 0) {
-      throw new NotFoundException(`User with address ${address} not found.`);
+  async delete(address: string): Promise<void> {
+    const { affected: affectedRows } = await this.usersRepository
+      .createQueryBuilder('users')
+      .delete()
+      .from(User)
+      .where('address = :address', { address })
+      .execute();
+    if (affectedRows === 0) {
+      throw new NotFoundException(`User with address ${address} not found`);
     }
+    return;
   }
 }
