@@ -8,7 +8,7 @@ import { Drop } from './drop.entity';
 import { Repository } from 'typeorm';
 import { CreateDropDto } from './dto/create-drop.dto';
 import { MintlinkService } from './mintlinks.service';
-import { UsersService } from '../users/users.service';
+import { UsersService } from 'src/users/users.service';
 import { DropIdDto } from './dto/drop-id.dto';
 import { UpdateDropDto } from './dto/update-drop.dto';
 
