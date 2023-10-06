@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Drop } from './drop.entity';
 
 @Entity()
 export class Mintlink {
@@ -10,4 +11,7 @@ export class Mintlink {
 
   @Column()
   remainingUses: number;
+
+  @ManyToOne(() => Drop, (drop) => drop.mintlinks, { onDelete: 'CASCADE' })
+  drop: Drop;
 }

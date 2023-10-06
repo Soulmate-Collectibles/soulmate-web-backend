@@ -2,6 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Mintlink } from './mintlink.entity';
 import { Repository } from 'typeorm';
+import { Drop } from './drop.entity';
 
 @Injectable()
 export class MintlinksService {
@@ -10,10 +11,15 @@ export class MintlinksService {
     private readonly mintlinksRepository: Repository<Mintlink>,
   ) {}
 
-  async create(expiresAt: Date, remainingUses: number): Promise<Mintlink> {
+  async create(
+    expiresAt: Date,
+    remainingUses: number,
+    drop: Drop,
+  ): Promise<Mintlink> {
     const mintlink = this.mintlinksRepository.create({
       expiresAt,
       remainingUses,
+      drop,
     });
     return await this.mintlinksRepository.save(mintlink);
   }

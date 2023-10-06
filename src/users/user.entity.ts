@@ -1,5 +1,5 @@
-import { Drop } from '../drops/drop.entity';
 import { Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
+import { Drop } from '../drops/drop.entity';
 
 @Entity()
 export class User {

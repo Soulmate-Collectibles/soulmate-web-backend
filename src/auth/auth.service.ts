@@ -4,9 +4,9 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { randomBytes } from 'crypto';
 import { User } from '../users/user.entity';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -28,7 +28,7 @@ export class AuthService {
       return;
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException('Address already exists');
+        throw new ConflictException(`Address ${address} already exists`);
       } else {
         throw new InternalServerErrorException();
       }

@@ -7,8 +7,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('/signup')
-  signUp(@Body() createUserDto: UserAddressDto): Promise<void> {
-    const { address } = createUserDto;
+  signUp(@Body() userAddressDto: UserAddressDto): Promise<void> {
+    const { address } = userAddressDto;
     return this.authService.createUser(address);
   }
 }

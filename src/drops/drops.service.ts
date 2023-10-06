@@ -34,45 +34,36 @@ export class DropsService {
     const creator = await this.usersService.getOneByAddress(creatorAddress);
     const expiryDate = new Date(endDate);
     expiryDate.setMonth(expiryDate.getMonth() + 1);
-    const mintlink = await this.mintlinksService.create(
-      expiryDate,
+    // await this.dropsRepository
+    //   .createQueryBuilder()
+    //   .insert()
+    //   .into(Drop)
+    //   .values({
+    //     title,
+    //     description,
+    //     image,
+    //     startDate,
+    //     endDate,
+    //     totalAmount,
+    //     creator,
+    //     mintlinks: [],
+    //   })
+    //   .execute();
+    const drop = this.dropsRepository.create({
+      title,
+      description,
+      image,
+      startDate,
+      endDate,
       totalAmount,
+      creator,
+    });
+    const dropGuardado = await this.dropsRepository.save(drop);
+    console.log(
+      await this.mintlinksService.create(expiryDate, totalAmount, dropGuardado),
     );
-    await this.dropsRepository
-      .createQueryBuilder()
-      .insert()
-      .into(Drop)
-      .values({
-        title,
-        description,
-        image,
-        startDate,
-        endDate,
-        totalAmount,
-        creator,
-        mintlink,
-      })
-      .execute();
-    return;
+    return await this.dropsRepository.save(drop);
   }
-
-  // const { endDate, totalAmount, creatorAddress } = createDropDto;
-  // const creator = await this.usersService.getPartialUserByAddress(
-  //   creatorAddress,
-  // );
-  // delete createDropDto.creatorAddress;
-  // const expiryDate = new Date(endDate);
-  // expiryDate.setMonth(expiryDate.getMonth() + 1);
-  // const mintlink = await this.mintlinksService.createMintlink(
-  //   expiryDate,
-  //   totalAmount,
-  // );
-  // const drop = this.dropsRepository.create({
-  //   ...createDropDto,
-  //   mintlink,
-  //   creator,
-  // });
-  // return await this.dropsRepository.save(drop);
 
   async getFullDropById(dropId: string): Promise<Drop> {
     const found = await this.dropsRepository.findOne({
@@ -80,7 +71,7 @@ export class DropsService {
         id: dropId,
       },
       relations: {
-        mintlink: true,
+        mintlinks: true,
       },
     });
     if (!found) {
@@ -95,7 +86,7 @@ export class DropsService {
   ): Promise<Drop> {
     const { id } = dropIdDto;
     const drop = await this.getFullDropById(id);
-    if (drop.totalAmount !== drop.mintlink.remainingUses) {
+    if (drop.totalAmount !== drop.mintlinks[0].remainingUses) {
       throw new ConflictException();
     }
     const { title, description, image } = updateDropDto;
@@ -116,7 +107,7 @@ export class DropsService {
     const { id } = dropIdDto;
     const drop = await this.getFullDropById(id);
     await this.dropsRepository.delete(id);
-    await this.mintlinksService.deleteMintlink(drop.mintlink.id);
+    await this.mintlinksService.deleteMintlink(drop.mintlinks[0].id);
   }
 
   async deleteDropsByCreatorAddress(address: string): Promise<void> {

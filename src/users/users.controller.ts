@@ -2,7 +2,6 @@ import { Controller, Delete, Get, Param } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UserAddressDto } from './dto/user-address.dto';
 import { User } from './user.entity';
-import { DropsService } from 'src/drops/drops.service';
 
 @Controller('users')
 export class UsersController {

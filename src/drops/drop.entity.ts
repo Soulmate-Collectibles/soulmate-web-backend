@@ -3,6 +3,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -32,10 +33,9 @@ export class Drop {
   @Column()
   totalAmount: number;
 
-  @OneToOne(() => Mintlink)
-  @JoinColumn()
-  mintlink: Mintlink;
-
-  @ManyToOne(() => User, (user) => user.drops)
+  @ManyToOne(() => User, (user) => user.drops, { onDelete: 'CASCADE' })
   creator: User;
+
+  @OneToMany(() => Mintlink, (mintlink) => mintlink.drop)
+  mintlinks: Mintlink[];
 }
