@@ -13,6 +13,7 @@ export class UsersService {
     const user = await this.usersRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.drops', 'drop')
+      .leftJoinAndSelect('drop.mintlinks', 'mintlink')
       .where('user.address = :address', { address })
       .getOne();
     if (!user) {
@@ -21,14 +22,17 @@ export class UsersService {
     return user;
   }
 
-  async getPartialUserByAddress(address: string): Promise<User> {
-    const found = await this.usersRepository.findOneBy({
-      address,
-    });
-    if (!found) {
+  async getOnePartialByAddress(address: string): Promise<User> {
+    const user = await this.usersRepository
+      .createQueryBuilder()
+      .select('user')
+      .from(User, 'user')
+      .where('user.address = :address', { address })
+      .getOne();
+    if (!user) {
       throw new NotFoundException(`User with address ${address} not found.`);
     }
-    return found;
+    return user;
   }
 
   async delete(address: string): Promise<void> {

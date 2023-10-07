@@ -14,18 +14,17 @@ export class AuthService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
 
-  async createUser(address: string): Promise<void> {
+  async create(address: string): Promise<User> {
+    const nonce = this.generateNonce();
     try {
+      const user = this.usersRepository.create({ address, nonce });
       await this.usersRepository
         .createQueryBuilder()
         .insert()
         .into(User)
-        .values({
-          address,
-          nonce: this.generateNonce(),
-        })
+        .values(user)
         .execute();
-      return;
+      return user;
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException(`Address ${address} already exists`);

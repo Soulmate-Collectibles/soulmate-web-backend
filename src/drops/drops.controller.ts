@@ -5,6 +5,8 @@ import { DropIdDto } from './dto/drop-id.dto';
 import { UpdateDropDto } from './dto/update-drop.dto';
 import { UserAddressDto } from '../users/dto/user-address.dto';
 import { MintlinksService } from './mintlinks.service';
+import { Drop } from './drop.entity';
+import { Mintlink } from './mintlink.entity';
 
 @Controller('drops')
 export class DropsController {
@@ -14,7 +16,7 @@ export class DropsController {
   ) {}
 
   @Post()
-  create(@Body() createDropDto: CreateDropDto) {
+  create(@Body() createDropDto: CreateDropDto): Promise<Mintlink> {
     const {
       title,
       description,
