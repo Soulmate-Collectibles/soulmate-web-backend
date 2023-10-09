@@ -7,10 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Drop } from './drop.entity';
 import { MintlinksService } from './mintlinks.service';
-import { UsersService } from '../users/users.service';
-import { DropIdDto } from './dto/drop-id.dto';
-import { UpdateDropDto } from './dto/update-drop.dto';
 import { Mintlink } from './mintlink.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class DropsService {
@@ -29,9 +27,7 @@ export class DropsService {
     totalAmount: number,
     creatorAddress: string,
   ): Promise<Mintlink> {
-    const creator = await this.usersService.getOnePartialByAddress(
-      creatorAddress,
-    );
+    const creator = await this.usersService.getOnePartial(creatorAddress);
     const expiryDate = new Date(endDate);
     expiryDate.setMonth(expiryDate.getMonth() + 1);
     const drop = this.dropsRepository.create({
@@ -47,30 +43,30 @@ export class DropsService {
     return await this.mintlinksService.create(expiryDate, totalAmount, drop);
   }
 
-  async getFullOneById(dropId: string): Promise<Drop> {
+  async getFullOne(dropId: string): Promise<Drop> {
     const drop = await this.dropsRepository
       .createQueryBuilder('drop')
       .leftJoinAndSelect('drop.mintlinks', 'mintlink')
       .where('drop.id = :dropId', { dropId })
       .getOne();
     if (!drop) {
-      throw new NotFoundException(`Drop with id ${dropId} not found.`);
+      throw new NotFoundException(`Drop with id ${dropId} not found`);
     }
     return drop;
   }
 
-  async updateDrop(
-    dropIdDto: DropIdDto,
-    updateDropDto: UpdateDropDto,
+  async update(
+    id: string,
+    title: string,
+    description: string,
+    image: string,
   ): Promise<Drop> {
-    const { id } = dropIdDto;
-    const drop = await this.getFullOneById(id);
+    const drop = await this.getFullOne(id);
     if (drop.totalAmount !== drop.mintlinks[0].remainingUses) {
       throw new ConflictException(
-        `No puedes realizar esta acción una vez se ha minteado algún Soulmate`,
+        `Cannot update drop with id ${id} because it has already been minted`,
       );
     }
-    const { title, description, image } = updateDropDto;
     if (title) {
       drop.title = title;
     }
@@ -80,26 +76,19 @@ export class DropsService {
     if (image) {
       drop.image = image;
     }
-    await this.dropsRepository.save(drop);
-    return drop;
+    return await this.dropsRepository.save(drop);
   }
 
-  async deleteDropById(dropIdDto: DropIdDto): Promise<void> {
-    const { id } = dropIdDto;
-    const drop = await this.getFullOneById(id);
-    await this.dropsRepository.delete(id);
-    await this.mintlinksService.deleteMintlink(drop.mintlinks[0].id);
-  }
-
-  async deleteDropsByCreatorAddress(address: string): Promise<void> {
-    const result = await this.dropsRepository
-      .createQueryBuilder('drops')
+  async delete(id: string): Promise<void> {
+    const { affected: affectedRows } = await this.dropsRepository
+      .createQueryBuilder()
       .delete()
       .from(Drop)
-      .where('creatorAddress = :address', { address })
+      .where('id = :id', { id })
       .execute();
-    // const drop = await this.getFullDropById(id);
-    // await this.dropsRepository.delete(id);
-    // await this.mintlinksService.deleteMintlink(drop.mintlink.id);
+    if (affectedRows === 0) {
+      throw new NotFoundException(`Drop with id ${id} not found`);
+    }
+    return;
   }
 }

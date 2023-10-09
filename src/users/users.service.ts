@@ -9,7 +9,7 @@ export class UsersService {
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
 
-  async getOneByAddress(address: string): Promise<User> {
+  async getOneFull(address: string): Promise<User> {
     const user = await this.usersRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.drops', 'drop')
@@ -22,7 +22,7 @@ export class UsersService {
     return user;
   }
 
-  async getOnePartialByAddress(address: string): Promise<User> {
+  async getOnePartial(address: string): Promise<User> {
     const user = await this.usersRepository
       .createQueryBuilder()
       .select('user')

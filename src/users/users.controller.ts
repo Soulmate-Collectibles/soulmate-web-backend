@@ -8,9 +8,9 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get('/:address')
-  getOneByAddress(@Param() userAddressDto: UserAddressDto): Promise<User> {
+  getOne(@Param() userAddressDto: UserAddressDto): Promise<User> {
     const { address } = userAddressDto;
-    return this.usersService.getOneByAddress(address);
+    return this.usersService.getOneFull(address);
   }
 
   @Delete('/:address')
