@@ -32,7 +32,10 @@ export class DropsController {
   }
 
   @Patch('/:id')
-  update(@Param() dropIdDto: DropIdDto, @Body() updateDropDto: UpdateDropDto) {
+  update(
+    @Param() dropIdDto: DropIdDto,
+    @Body() updateDropDto: UpdateDropDto,
+  ): Promise<void> {
     const { id } = dropIdDto;
     const { title, description, image } = updateDropDto;
     return this.dropsService.update(id, title, description, image);

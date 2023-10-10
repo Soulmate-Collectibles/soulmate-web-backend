@@ -6,11 +6,11 @@ import { MintlinksService } from './mintlinks.service';
 import { Drop } from './drop.entity';
 import { Mintlink } from './mintlink.entity';
 import { UsersModule } from '../users/users.module';
+import { MintlinksController } from './mintlinks.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Drop, Mintlink]), UsersModule],
-  controllers: [DropsController],
+  controllers: [DropsController, MintlinksController],
   providers: [DropsService, MintlinksService],
-  exports: [DropsService],
 })
 export class DropsModule {}
