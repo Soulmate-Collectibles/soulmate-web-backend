@@ -60,7 +60,7 @@ export class DropsService {
     title: string,
     description: string,
     image: string,
-  ): Promise<Drop> {
+  ): Promise<void> {
     const drop = await this.getFullOne(id);
     if (drop.totalAmount !== drop.mintlinks[0].remainingUses) {
       throw new ConflictException(
@@ -76,7 +76,8 @@ export class DropsService {
     if (image) {
       drop.image = image;
     }
-    return await this.dropsRepository.save(drop);
+    await this.dropsRepository.save(drop);
+    return;
   }
 
   async delete(id: string): Promise<void> {
