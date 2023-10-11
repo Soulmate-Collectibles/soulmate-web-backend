@@ -2,10 +2,12 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomBytes } from 'crypto';
+import { ethers } from 'ethers';
 import { User } from '../users/user.entity';
 
 @Injectable()
@@ -31,6 +33,20 @@ export class AuthService {
       } else {
         throw new InternalServerErrorException();
       }
+    }
+  }
+
+  async signIn(address: string, message: string, signedMessage: string) {
+    const user = await this.usersRepository
+      .createQueryBuilder()
+      .select('user')
+      .from(User, 'user')
+      .where('user.address = :address', { address })
+      .getOne();
+    const recoveredAddress = ethers.verifyMessage(message, signedMessage);
+    if (user && recoveredAddress === address) {
+    } else {
+      throw new UnauthorizedException('Please check your login credentials');
     }
   }
 
