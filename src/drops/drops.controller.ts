@@ -1,11 +1,21 @@
-import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { DropsService } from './drops.service';
 import { CreateDropDto } from './dto/create-drop.dto';
 import { DropIdDto } from './dto/drop-id.dto';
 import { UpdateDropDto } from './dto/update-drop.dto';
 import { Mintlink } from './mintlink.entity';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('drops')
+@UseGuards(AuthGuard())
 export class DropsController {
   constructor(private readonly dropsService: DropsService) {}
 

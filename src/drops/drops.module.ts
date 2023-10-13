@@ -7,9 +7,14 @@ import { Drop } from './drop.entity';
 import { Mintlink } from './mintlink.entity';
 import { UsersModule } from '../users/users.module';
 import { MintlinksController } from './mintlinks.controller';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Drop, Mintlink]), UsersModule],
+  imports: [
+    TypeOrmModule.forFeature([Drop, Mintlink]),
+    UsersModule,
+    AuthModule,
+  ],
   controllers: [DropsController, MintlinksController],
   providers: [DropsService, MintlinksService],
 })

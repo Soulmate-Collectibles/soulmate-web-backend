@@ -28,7 +28,7 @@ export class MintlinksService {
     return await this.mintlinksRepository.save(mintlink);
   }
 
-  async getOnePartial(id: string) {
+  async getOnePartial(id: string): Promise<Mintlink> {
     const mintlink = await this.mintlinksRepository
       .createQueryBuilder()
       .select('mintlink')
@@ -41,7 +41,7 @@ export class MintlinksService {
     return mintlink;
   }
 
-  async getOneFull(id: string) {
+  async getOneFull(id: string): Promise<Mintlink> {
     const mintlink = await this.mintlinksRepository
       .createQueryBuilder('mintlink')
       .leftJoinAndSelect('mintlink.drop', 'drop')

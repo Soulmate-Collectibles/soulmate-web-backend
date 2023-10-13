@@ -1,4 +1,9 @@
-import { IsEthereumAddress, IsString, Length } from 'class-validator';
+import {
+  IsEthereumAddress,
+  IsHexadecimal,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class AuthCredentialsDto {
   @IsEthereumAddress()
@@ -9,5 +14,7 @@ export class AuthCredentialsDto {
   message: string;
 
   @IsString()
+  @IsHexadecimal()
+  @Length(132, 132, { message: 'Signed message must be a valid signature' })
   signedMessage: string;
 }

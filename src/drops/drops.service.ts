@@ -43,7 +43,7 @@ export class DropsService {
     return await this.mintlinksService.create(expiryDate, totalAmount, drop);
   }
 
-  async getFullOne(dropId: string): Promise<Drop> {
+  async getOneFull(dropId: string): Promise<Drop> {
     const drop = await this.dropsRepository
       .createQueryBuilder('drop')
       .leftJoinAndSelect('drop.mintlinks', 'mintlink')
@@ -61,7 +61,7 @@ export class DropsService {
     description: string,
     image: string,
   ): Promise<void> {
-    const drop = await this.getFullOne(id);
+    const drop = await this.getOneFull(id);
     if (drop.totalAmount !== drop.mintlinks[0].remainingUses) {
       throw new ConflictException(
         `Cannot update drop with id ${id} because it has already been minted`,
