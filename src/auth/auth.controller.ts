@@ -8,11 +8,11 @@ import { AuthCredentialsDto } from './dto/auth-credentials.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // @Post('/signup')
-  // signUp(@Body() userAddressDto: UserAddressDto): Promise<User> {
-  //   const { address } = userAddressDto;
-  //   return this.authService.create(address);
-  // }
+  @Post('/signup')
+  signUp(@Body() userAddressDto: UserAddressDto): Promise<User> {
+    const { address } = userAddressDto;
+    return this.authService.signup(address);
+  }
 
   @Post('/signin')
   signIn(

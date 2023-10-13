@@ -1,21 +1,19 @@
 import {
-  ConflictException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { Repository } from 'typeorm';
 import { ethers } from 'ethers';
 import { randomBytes } from 'crypto';
-import { User } from '../users/user.entity';
 import { JwtPayload } from './jwt-payload.interface';
+import { User } from '../users/user.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) private readonly usersRepository: Repository<User>,
+    private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -24,12 +22,7 @@ export class AuthService {
     message: string,
     signedMessage: string,
   ): Promise<{ accessToken: string }> {
-    const user = await this.usersRepository
-      .createQueryBuilder()
-      .select('user')
-      .from(User, 'user')
-      .where('user.address = :address', { address })
-      .getOne();
+    const user = this.usersService.getOnePartial(address);
     try {
       const recoveredAddress = ethers.verifyMessage(message, signedMessage);
       if (user && recoveredAddress === address) {
@@ -42,6 +35,11 @@ export class AuthService {
     } catch (error) {
       throw new InternalServerErrorException();
     }
+  }
+
+  signup(address: string): Promise<User> {
+    const nonce = this.generateNonce();
+    return this.usersService.create(address, nonce);
   }
 
   generateNonce(): string {
