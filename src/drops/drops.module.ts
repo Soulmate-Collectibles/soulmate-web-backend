@@ -2,20 +2,19 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DropsController } from './drops.controller';
 import { DropsService } from './drops.service';
-import { MintlinksService } from './mintlinks.service';
 import { Drop } from './drop.entity';
-import { Mintlink } from './mintlink.entity';
 import { UsersModule } from '../users/users.module';
-import { MintlinksController } from './mintlinks.controller';
 import { AuthModule } from 'src/auth/auth.module';
+import { MintlinksModule } from 'src/mintlinks/mintlinks.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Drop, Mintlink]),
+    TypeOrmModule.forFeature([Drop]),
     UsersModule,
     AuthModule,
+    MintlinksModule,
   ],
-  controllers: [DropsController, MintlinksController],
-  providers: [DropsService, MintlinksService],
+  controllers: [DropsController],
+  providers: [DropsService],
 })
 export class DropsModule {}

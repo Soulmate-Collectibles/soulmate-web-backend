@@ -6,8 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Drop } from './drop.entity';
-import { MintlinksService } from './mintlinks.service';
-import { Mintlink } from './mintlink.entity';
+import { MintlinksService } from '../mintlinks/mintlinks.service';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
@@ -26,10 +25,11 @@ export class DropsService {
     endDate: Date,
     totalAmount: number,
     creatorAddress: string,
-  ): Promise<Mintlink> {
+  ): Promise<Drop> {
     const creator = await this.usersService.getOnePartial(creatorAddress);
     const expiryDate = new Date(endDate);
     expiryDate.setMonth(expiryDate.getMonth() + 1);
+    const mintlink = this.mintlinksService.create(expiryDate, totalAmount);
     const drop = this.dropsRepository.create({
       title,
       description,
@@ -38,9 +38,9 @@ export class DropsService {
       endDate,
       totalAmount,
       creator,
+      mintlinks: [mintlink],
     });
-    await this.dropsRepository.save(drop);
-    return await this.mintlinksService.create(expiryDate, totalAmount, drop);
+    return await this.dropsRepository.save(drop);
   }
 
   async getOneFull(dropId: string): Promise<Drop> {

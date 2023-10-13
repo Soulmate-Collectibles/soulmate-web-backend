@@ -4,6 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { DropsModule } from './drops/drops.module';
+import { MintlinksModule } from './mintlinks/mintlinks.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { DropsModule } from './drops/drops.module';
     AuthModule,
     UsersModule,
     DropsModule,
+    MintlinksModule,
   ],
 })
 export class AppModule {}
