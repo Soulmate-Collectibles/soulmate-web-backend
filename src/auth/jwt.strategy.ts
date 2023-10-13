@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: JwtPayload): Promise<User> {
-    const { address } = payload;
+    const { sub: address } = payload;
     const user: User = await this.usersRepository
       .createQueryBuilder()
       .select('user')

@@ -13,6 +13,12 @@ export class UsersController {
     return this.usersService.getOneFull(address);
   }
 
+  @Get('/:address/nonce')
+  getOneNonce(@Param() userAddressDto: UserAddressDto): Promise<User> {
+    const { address } = userAddressDto;
+    return this.usersService.getOnePartial(address);
+  }
+
   @Delete('/:address')
   delete(@Param() userAddressDto: UserAddressDto): Promise<void> {
     const { address } = userAddressDto;
