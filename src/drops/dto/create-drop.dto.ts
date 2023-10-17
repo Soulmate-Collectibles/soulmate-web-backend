@@ -34,7 +34,4 @@ export class CreateDropDto {
   // @Min(1)
   // @Max(100)
   totalAmount: number;
-
-  @IsEthereumAddress()
-  creatorAddress: string;
 }

@@ -32,14 +32,17 @@ export class MintlinksService {
     return mintlink;
   }
 
-  async getOneFull(id: string): Promise<Mintlink> {
+  async getOneFull(id: string, creatorAddress: string): Promise<Mintlink> {
     const mintlink = await this.mintlinksRepository
       .createQueryBuilder('mintlink')
       .leftJoinAndSelect('mintlink.drop', 'drop')
       .where('mintlink.id = :id', { id })
+      .andWhere('drop.creatorAddress = :creatorAddress', {
+        creatorAddress,
+      })
       .getOne();
     if (!mintlink) {
-      throw new NotFoundException(`Mintlink with id ${id} not found`);
+      throw new NotFoundException(`Mintlink not found`);
     }
     return mintlink;
   }

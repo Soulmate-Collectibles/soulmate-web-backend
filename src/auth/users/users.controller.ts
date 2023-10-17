@@ -3,6 +3,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { UserAddressDto } from './dto/user-address.dto';
+import { GetUser } from '../auth/get-user.decorator';
 
 @Controller('users')
 export class UsersController {
@@ -10,9 +11,13 @@ export class UsersController {
 
   @UseGuards(AuthGuard())
   @Get('/:address')
-  getOne(@Param() userAddressDto: UserAddressDto): Promise<User> {
+  getOne(
+    @Param() userAddressDto: UserAddressDto,
+    @GetUser() user: User,
+  ): Promise<User> {
     const { address } = userAddressDto;
-    return this.usersService.getOneFull(address);
+    const { address: requestUserAddress } = user;
+    return this.usersService.getOneFull(address, requestUserAddress);
   }
 
   @Get('/:address/nonce')
@@ -23,8 +28,12 @@ export class UsersController {
 
   @UseGuards(AuthGuard())
   @Delete('/:address')
-  delete(@Param() userAddressDto: UserAddressDto): Promise<void> {
+  delete(
+    @Param() userAddressDto: UserAddressDto,
+    @GetUser() user: User,
+  ): Promise<void> {
     const { address } = userAddressDto;
-    return this.usersService.delete(address);
+    const { address: requestUserAddress } = user;
+    return this.usersService.delete(address, requestUserAddress);
   }
 }

@@ -44,7 +44,10 @@ export class UsersService {
     return user;
   }
 
-  async getOneFull(address: string): Promise<User> {
+  async getOneFull(address: string, requestUserAddress: string): Promise<User> {
+    if (requestUserAddress !== address) {
+      throw new NotFoundException(`User not found`);
+    }
     const user = await this.usersRepository
       .createQueryBuilder('user')
       .leftJoinAndSelect('user.drops', 'drop')
@@ -54,10 +57,20 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User with address ${address} not found`);
     }
+    /* 
+    la validación anterior sobra ya que para obtener un JWT válido
+    se debió hacer request a la ruta signIn que valida que el usuario exista
+    sin embargo, se deja porque actualmente no se expiran los JWT asociados
+    a un usuario X cuando este es borrado de Base de Datos, lo que puede
+    introducir un bug
+    */
     return user;
   }
 
-  async delete(address: string): Promise<void> {
+  async delete(address: string, requestUserAddress: string): Promise<void> {
+    if (requestUserAddress !== address) {
+      throw new NotFoundException(`User not found`);
+    }
     const { affected: affectedRows } = await this.usersRepository
       .createQueryBuilder()
       .delete()
@@ -67,6 +80,13 @@ export class UsersService {
     if (affectedRows === 0) {
       throw new NotFoundException(`User with address ${address} not found`);
     }
+    /* 
+    la validación anterior sobra ya que para obtener un JWT válido
+    se debió hacer request a la ruta signIn que valida que el usuario exista
+    sin embargo, se deja porque actualmente no se expiran los JWT asociados
+    a un usuario X cuando este es borrado de Base de Datos, lo que puede
+    introducir un bug
+    */
     return;
   }
 }

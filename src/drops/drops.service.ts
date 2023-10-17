@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { Drop } from './drop.entity';
 import { MintlinksService } from '../mintlinks/mintlinks.service';
 import { UsersService } from '../auth/users/users.service';
+import { User } from 'src/auth/users/user.entity';
 
 @Injectable()
 export class DropsService {
@@ -43,14 +44,15 @@ export class DropsService {
     return await this.dropsRepository.save(drop);
   }
 
-  async getOneFull(dropId: string): Promise<Drop> {
+  async getOneFull(dropId: string, creatorAddress: string): Promise<Drop> {
     const drop = await this.dropsRepository
       .createQueryBuilder('drop')
       .leftJoinAndSelect('drop.mintlinks', 'mintlink')
       .where('drop.id = :dropId', { dropId })
+      .andWhere('drop.creatorAddress = :creatorAddress', { creatorAddress })
       .getOne();
     if (!drop) {
-      throw new NotFoundException(`Drop with id ${dropId} not found`);
+      throw new NotFoundException(`Drop not found`);
     }
     return drop;
   }
@@ -60,8 +62,9 @@ export class DropsService {
     title: string,
     description: string,
     image: string,
+    requestUserAddress: string,
   ): Promise<void> {
-    const drop = await this.getOneFull(id);
+    const drop = await this.getOneFull(id, requestUserAddress);
     if (drop.totalAmount !== drop.mintlinks[0].remainingUses) {
       throw new ConflictException(
         `Cannot update drop with id ${id} because it has already been minted`,
@@ -80,15 +83,18 @@ export class DropsService {
     return;
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: string, requestUserAddress: string): Promise<void> {
     const { affected: affectedRows } = await this.dropsRepository
       .createQueryBuilder()
       .delete()
       .from(Drop)
       .where('id = :id', { id })
+      .andWhere('creatorAddress = :creatorAddress', {
+        creatorAddress: requestUserAddress,
+      })
       .execute();
     if (affectedRows === 0) {
-      throw new NotFoundException(`Drop with id ${id} not found`);
+      throw new NotFoundException(`Drop not found`);
     }
     return;
   }

@@ -4,6 +4,8 @@ import { MintlinksService } from './mintlinks.service';
 import { Mintlink } from './mintlink.entity';
 import { UpdateMintlinkDto } from './dto/update-mintlink.dto';
 import { UUIDDto } from '../drops/dto/uuid.dto';
+import { GetUser } from 'src/auth/auth/get-user.decorator';
+import { User } from 'src/auth/users/user.entity';
 
 @Controller('mintlinks')
 export class MintlinksController {
@@ -21,8 +23,9 @@ export class MintlinksController {
 
   @UseGuards(AuthGuard())
   @Get('/:id')
-  getOne(@Param() uuidDto: UUIDDto): Promise<Mintlink> {
+  getOne(@Param() uuidDto: UUIDDto, @GetUser() user: User): Promise<Mintlink> {
     const { id } = uuidDto;
-    return this.mintlinksService.getOneFull(id);
+    const { address } = user;
+    return this.mintlinksService.getOneFull(id, address);
   }
 }
