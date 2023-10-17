@@ -6,9 +6,8 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Drop } from './drop.entity';
-import { MintlinksService } from './mintlinks.service';
-import { Mintlink } from './mintlink.entity';
-import { UsersService } from '../users/users.service';
+import { MintlinksService } from '../mintlinks/mintlinks.service';
+import { UsersService } from '../auth/users/users.service';
 
 @Injectable()
 export class DropsService {
@@ -26,10 +25,11 @@ export class DropsService {
     endDate: Date,
     totalAmount: number,
     creatorAddress: string,
-  ): Promise<Mintlink> {
+  ): Promise<Drop> {
     const creator = await this.usersService.getOnePartial(creatorAddress);
     const expiryDate = new Date(endDate);
     expiryDate.setMonth(expiryDate.getMonth() + 1);
+    const mintlink = this.mintlinksService.create(expiryDate, totalAmount);
     const drop = this.dropsRepository.create({
       title,
       description,
@@ -38,12 +38,12 @@ export class DropsService {
       endDate,
       totalAmount,
       creator,
+      mintlinks: [mintlink],
     });
-    await this.dropsRepository.save(drop);
-    return await this.mintlinksService.create(expiryDate, totalAmount, drop);
+    return await this.dropsRepository.save(drop);
   }
 
-  async getFullOne(dropId: string): Promise<Drop> {
+  async getOneFull(dropId: string): Promise<Drop> {
     const drop = await this.dropsRepository
       .createQueryBuilder('drop')
       .leftJoinAndSelect('drop.mintlinks', 'mintlink')
@@ -61,7 +61,7 @@ export class DropsService {
     description: string,
     image: string,
   ): Promise<void> {
-    const drop = await this.getFullOne(id);
+    const drop = await this.getOneFull(id);
     if (drop.totalAmount !== drop.mintlinks[0].remainingUses) {
       throw new ConflictException(
         `Cannot update drop with id ${id} because it has already been minted`,

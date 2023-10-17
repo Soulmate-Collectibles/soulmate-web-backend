@@ -1,16 +1,26 @@
-import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { DropsService } from './drops.service';
 import { CreateDropDto } from './dto/create-drop.dto';
 import { DropIdDto } from './dto/drop-id.dto';
 import { UpdateDropDto } from './dto/update-drop.dto';
-import { Mintlink } from './mintlink.entity';
+import { Drop } from './drop.entity';
 
 @Controller('drops')
+@UseGuards(AuthGuard())
 export class DropsController {
   constructor(private readonly dropsService: DropsService) {}
 
   @Post()
-  create(@Body() createDropDto: CreateDropDto): Promise<Mintlink> {
+  create(@Body() createDropDto: CreateDropDto): Promise<Drop> {
     const {
       title,
       description,

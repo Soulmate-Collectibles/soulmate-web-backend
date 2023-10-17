@@ -5,8 +5,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Mintlink } from './mintlink.entity';
-import { User } from '../users/user.entity';
+import { Mintlink } from '../mintlinks/mintlink.entity';
+import { User } from '../auth/users/user.entity';
 
 @Entity()
 export class Drop {
@@ -34,6 +34,6 @@ export class Drop {
   @ManyToOne(() => User, (user) => user.drops, { onDelete: 'CASCADE' })
   creator: User;
 
-  @OneToMany(() => Mintlink, (mintlink) => mintlink.drop)
+  @OneToMany(() => Mintlink, (mintlink) => mintlink.drop, { cascade: true })
   mintlinks: Mintlink[];
 }

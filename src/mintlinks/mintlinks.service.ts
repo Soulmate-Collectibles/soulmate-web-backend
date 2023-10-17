@@ -4,9 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Mintlink } from './mintlink.entity';
 import { Repository } from 'typeorm';
-import { Drop } from './drop.entity';
+import { Mintlink } from './mintlink.entity';
 
 @Injectable()
 export class MintlinksService {
@@ -15,24 +14,16 @@ export class MintlinksService {
     private readonly mintlinksRepository: Repository<Mintlink>,
   ) {}
 
-  async create(
-    expiresAt: Date,
-    remainingUses: number,
-    drop: Drop,
-  ): Promise<Mintlink> {
-    const mintlink = this.mintlinksRepository.create({
+  create(expiresAt: Date, remainingUses: number): Mintlink {
+    return this.mintlinksRepository.create({
       expiresAt,
       remainingUses,
-      drop,
     });
-    return await this.mintlinksRepository.save(mintlink);
   }
 
-  async getOnePartial(id: string) {
+  async getOnePartial(id: string): Promise<Mintlink> {
     const mintlink = await this.mintlinksRepository
-      .createQueryBuilder()
-      .select('mintlink')
-      .from(Mintlink, 'mintlink')
+      .createQueryBuilder('mintlink')
       .where('mintlink.id = :id', { id })
       .getOne();
     if (!mintlink) {
@@ -41,7 +32,7 @@ export class MintlinksService {
     return mintlink;
   }
 
-  async getOneFull(id: string) {
+  async getOneFull(id: string): Promise<Mintlink> {
     const mintlink = await this.mintlinksRepository
       .createQueryBuilder('mintlink')
       .leftJoinAndSelect('mintlink.drop', 'drop')
