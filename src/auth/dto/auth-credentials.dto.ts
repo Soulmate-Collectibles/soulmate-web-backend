@@ -10,7 +10,7 @@ export class AuthCredentialsDto {
   address: string;
 
   @IsString()
-  @Length(64, 64)
+  @Length(64, 64, { message: 'Invalid nonce' })
   message: string;
 
   @IsString()

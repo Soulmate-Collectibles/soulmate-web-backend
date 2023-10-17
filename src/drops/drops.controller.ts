@@ -15,7 +15,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Drop } from './drop.entity';
 
 @Controller('drops')
-// @UseGuards(AuthGuard())
+@UseGuards(AuthGuard())
 export class DropsController {
   constructor(private readonly dropsService: DropsService) {}
 

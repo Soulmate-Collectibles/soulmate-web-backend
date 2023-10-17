@@ -11,13 +11,13 @@ export class AuthController {
   @Post('/signup')
   signUp(@Body() userAddressDto: UserAddressDto): Promise<User> {
     const { address } = userAddressDto;
-    return this.authService.signup(address);
+    return this.authService.signUp(address);
   }
 
   @Post('/signin')
-  signIn(
-    @Body() authCredentialsDto: AuthCredentialsDto,
-  ): Promise<{ accessToken: string }> {
+  signIn(@Body() authCredentialsDto: AuthCredentialsDto): {
+    access_token: string;
+  } {
     const { address, message, signedMessage } = authCredentialsDto;
     return this.authService.signIn(address, message, signedMessage);
   }

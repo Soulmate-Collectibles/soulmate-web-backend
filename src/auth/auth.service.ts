@@ -1,6 +1,6 @@
 import {
+  BadRequestException,
   Injectable,
-  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -17,27 +17,27 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signIn(
+  signIn(
     address: string,
     message: string,
     signedMessage: string,
-  ): Promise<{ accessToken: string }> {
+  ): { access_token: string } {
     const user = this.usersService.getOnePartial(address);
+    let recoveredAddress: string;
     try {
-      const recoveredAddress = ethers.verifyMessage(message, signedMessage);
-      if (user && recoveredAddress === address) {
-        const payload: JwtPayload = { sub: address };
-        const accessToken = await this.jwtService.signAsync(payload);
-        return { accessToken };
-      } else {
-        throw new UnauthorizedException('Please check your login credentials');
-      }
+      recoveredAddress = ethers.verifyMessage(message, signedMessage);
     } catch (error) {
-      throw new InternalServerErrorException();
+      throw new BadRequestException('Signed message must be a valid signature');
+    }
+    if (user && recoveredAddress === address) {
+      const payload: JwtPayload = { sub: address };
+      return { access_token: this.jwtService.sign(payload) };
+    } else {
+      throw new UnauthorizedException('Please check your login credentials');
     }
   }
 
-  signup(address: string): Promise<User> {
+  signUp(address: string): Promise<User> {
     const nonce = this.generateNonce();
     return this.usersService.create(address, nonce);
   }
