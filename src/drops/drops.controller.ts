@@ -7,11 +7,11 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { DropsService } from './drops.service';
 import { CreateDropDto } from './dto/create-drop.dto';
 import { DropIdDto } from './dto/drop-id.dto';
 import { UpdateDropDto } from './dto/update-drop.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { Drop } from './drop.entity';
 
 @Controller('drops')

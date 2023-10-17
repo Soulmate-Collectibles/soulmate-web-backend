@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
-import { MintlinksService } from './mintlinks.service';
-import { UpdateMintlinkDto } from './dto/update-mintlink.dto';
-import { Mintlink } from './mintlink.entity';
-import { UUIDDto } from '../drops/dto/uuid.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { MintlinksService } from './mintlinks.service';
+import { Mintlink } from './mintlink.entity';
+import { UpdateMintlinkDto } from './dto/update-mintlink.dto';
+import { UUIDDto } from '../drops/dto/uuid.dto';
 
 @Controller('mintlinks')
 export class MintlinksController {

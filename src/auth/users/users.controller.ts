@@ -1,14 +1,14 @@
 import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { UserAddressDto } from './dto/user-address.dto';
-import { User } from './user.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { UsersService } from './users.service';
+import { User } from './user.entity';
+import { UserAddressDto } from './dto/user-address.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  //@UseGuards(AuthGuard())
+  @UseGuards(AuthGuard())
   @Get('/:address')
   getOne(@Param() userAddressDto: UserAddressDto): Promise<User> {
     const { address } = userAddressDto;
@@ -21,7 +21,7 @@ export class UsersController {
     return this.usersService.getOnePartial(address);
   }
 
-  //@UseGuards(AuthGuard())
+  @UseGuards(AuthGuard())
   @Delete('/:address')
   delete(@Param() userAddressDto: UserAddressDto): Promise<void> {
     const { address } = userAddressDto;

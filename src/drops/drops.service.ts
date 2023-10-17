@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Drop } from './drop.entity';
 import { MintlinksService } from '../mintlinks/mintlinks.service';
-import { UsersService } from '../users/users.service';
+import { UsersService } from '../auth/users/users.service';
 
 @Injectable()
 export class DropsService {

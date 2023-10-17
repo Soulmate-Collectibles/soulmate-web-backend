@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Mintlink } from './mintlink.entity';
 import { Repository } from 'typeorm';
+import { Mintlink } from './mintlink.entity';
 
 @Injectable()
 export class MintlinksService {

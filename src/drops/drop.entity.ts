@@ -6,7 +6,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Mintlink } from '../mintlinks/mintlink.entity';
-import { User } from '../users/user.entity';
+import { User } from '../auth/users/user.entity';
 
 @Entity()
 export class Drop {
