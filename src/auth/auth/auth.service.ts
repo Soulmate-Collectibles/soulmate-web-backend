@@ -37,9 +37,9 @@ export class AuthService {
     }
   }
 
-  signUp(address: string): Promise<User> {
+  async signUp(address: string): Promise<User> {
     const nonce = this.generateNonce();
-    return this.usersService.create(address, nonce);
+    return await this.usersService.create(address, nonce);
   }
 
   generateNonce(): string {

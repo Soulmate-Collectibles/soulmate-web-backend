@@ -1,6 +1,5 @@
 import {
   IsDateString,
-  IsEthereumAddress,
   IsInt,
   IsNumber,
   IsNumberString,
@@ -20,9 +19,6 @@ export class CreateDropDto {
   @IsString()
   @MaxLength(300)
   description: string;
-
-  @IsUrl()
-  image: string;
 
   @IsDateString()
   startDate: Date;
