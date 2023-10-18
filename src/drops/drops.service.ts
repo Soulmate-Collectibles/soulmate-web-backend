@@ -8,7 +8,6 @@ import { Repository } from 'typeorm';
 import { Drop } from './drop.entity';
 import { MintlinksService } from '../mintlinks/mintlinks.service';
 import { UsersService } from '../auth/users/users.service';
-import { User } from 'src/auth/users/user.entity';
 
 @Injectable()
 export class DropsService {

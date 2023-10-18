@@ -4,8 +4,8 @@ import { MintlinksService } from './mintlinks.service';
 import { Mintlink } from './mintlink.entity';
 import { UpdateMintlinkDto } from './dto/update-mintlink.dto';
 import { UUIDDto } from '../drops/dto/uuid.dto';
-import { GetUser } from 'src/auth/auth/get-user.decorator';
-import { User } from 'src/auth/users/user.entity';
+import { GetUser } from '../auth/auth/get-user.decorator';
+import { User } from '../auth/users/user.entity';
 
 @Controller('mintlinks')
 export class MintlinksController {

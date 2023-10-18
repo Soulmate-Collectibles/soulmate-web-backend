@@ -2,37 +2,58 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { DropsService } from './drops.service';
 import { CreateDropDto } from './dto/create-drop.dto';
 import { DropIdDto } from './dto/drop-id.dto';
 import { UpdateDropDto } from './dto/update-drop.dto';
-import { Drop } from './drop.entity';
-import { GetUser } from 'src/auth/auth/get-user.decorator';
-import { User } from 'src/auth/users/user.entity';
+import { GetUser } from '../auth/auth/get-user.decorator';
+import { User } from '../auth/users/user.entity';
+import { IpfsService } from '../ipfs/ipfs.service';
 
 @Controller('drops')
 @UseGuards(AuthGuard())
 export class DropsController {
-  constructor(private readonly dropsService: DropsService) {}
+  constructor(
+    private readonly dropsService: DropsService,
+    private readonly ipfsService: IpfsService,
+  ) {}
 
   @Post()
-  create(
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
     @Body() createDropDto: CreateDropDto,
     @GetUser() user: User,
-  ): Promise<Drop> {
-    const { title, description, image, startDate, endDate, totalAmount } =
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 4194304 }),
+          new FileTypeValidator({ fileType: /image\/png|image\/gif/ }),
+        ],
+      }),
+    )
+    image: Express.Multer.File,
+  ) {
+    const { title, description, startDate, endDate, totalAmount } =
       createDropDto;
     const { address } = user;
-    return this.dropsService.create(
+    const { buffer } = image;
+    const imageUrl = await this.ipfsService.pinBufferToIpfs(buffer);
+    return await this.dropsService.create(
       title,
       description,
-      image,
+      imageUrl,
       startDate,
       endDate,
       totalAmount,
