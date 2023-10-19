@@ -56,19 +56,27 @@ export class DropsService {
     return drop;
   }
 
+  async getOnePartial(dropId: string, creatorAddress: string): Promise<Drop> {
+    const drop = await this.dropsRepository
+      .createQueryBuilder('drop')
+      .where('drop.id = :dropId', { dropId })
+      .andWhere('drop.creatorAddress = :creatorAddress', { creatorAddress })
+      .getOne();
+    if (!drop) {
+      throw new NotFoundException(`Drop not found`);
+    }
+    return drop;
+  }
+
   async update(
-    id: string,
+    dropId: string,
     title: string,
     description: string,
     image: string,
-    requestUserAddress: string,
+    creatorAddress: string,
   ): Promise<void> {
-    const drop = await this.getOneFull(id, requestUserAddress);
-    if (drop.totalAmount !== drop.mintlinks[0].remainingUses) {
-      throw new ConflictException(
-        `Cannot update drop with id ${id} because it has already been minted`,
-      );
-    }
+    this.notMintedValidation(dropId, creatorAddress);
+    const drop = await this.getOnePartial(dropId, creatorAddress);
     if (title) {
       drop.title = title;
     }
@@ -82,18 +90,37 @@ export class DropsService {
     return;
   }
 
-  async delete(id: string, requestUserAddress: string): Promise<void> {
+  async delete(dropId: string, requestUserAddress: string): Promise<void> {
     const { affected: affectedRows } = await this.dropsRepository
       .createQueryBuilder()
       .delete()
       .from(Drop)
-      .where('id = :id', { id })
+      .where('id = :dropId', { dropId })
       .andWhere('creatorAddress = :creatorAddress', {
         creatorAddress: requestUserAddress,
       })
       .execute();
     if (affectedRows === 0) {
       throw new NotFoundException(`Drop not found`);
+    }
+    return;
+  }
+
+  async notMintedValidation(
+    dropId: string,
+    creatorAddress: string,
+  ): Promise<void> {
+    const drop = await this.dropsRepository
+      .createQueryBuilder('drop')
+      .leftJoin('drop.mintlinks', 'mintlink')
+      .where('drop.id = :dropId', { dropId })
+      .andWhere('drop.creatorAddress = :creatorAddress', { creatorAddress })
+      .andWhere('drop.totalAmount = mintlink.remainingUses');
+
+    if (!drop) {
+      throw new ConflictException(
+        `Can not perform the operation because the drop has already been minted`,
+      );
     }
     return;
   }

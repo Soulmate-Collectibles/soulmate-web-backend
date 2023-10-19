@@ -61,17 +61,17 @@ export class DropsController {
     );
   }
 
-  @Patch('/:id')
-  update(
-    @Param() dropIdDto: DropIdDto,
-    @Body() updateDropDto: UpdateDropDto,
-    @GetUser() user: User,
-  ): Promise<void> {
-    const { id } = dropIdDto;
-    const { title, description, image } = updateDropDto;
-    const { address } = user;
-    return this.dropsService.update(id, title, description, image, address);
-  }
+  // @Patch('/:id')
+  // update(
+  //   @Param() dropIdDto: DropIdDto,
+  //   @Body() updateDropDto: UpdateDropDto,
+  //   @GetUser() user: User,
+  // ): Promise<void> {
+  //   const { id } = dropIdDto;
+  //   const { title, description, image } = updateDropDto;
+  //   const { address } = user;
+  //   return this.dropsService.update(id, title, description, image, address);
+  // }
 
   @Delete('/:id')
   delete(@Param() dropIdDto: DropIdDto, @GetUser() user: User): Promise<void> {

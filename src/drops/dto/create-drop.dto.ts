@@ -1,10 +1,8 @@
+import { Transform } from 'class-transformer';
 import {
   IsDateString,
   IsInt,
-  IsNumber,
-  IsNumberString,
   IsString,
-  IsUrl,
   Length,
   Max,
   MaxLength,
@@ -26,8 +24,9 @@ export class CreateDropDto {
   @IsDateString()
   endDate: Date;
 
-  @IsNumberString()
-  // @Min(1)
-  // @Max(100)
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @Max(100)
   totalAmount: number;
 }

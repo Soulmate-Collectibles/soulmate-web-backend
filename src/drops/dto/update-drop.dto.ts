@@ -1,9 +1,13 @@
+import { Transform } from 'class-transformer';
 import {
+  IsDateString,
+  IsInt,
   IsOptional,
   IsString,
-  IsUrl,
   Length,
+  Max,
   MaxLength,
+  Min,
 } from 'class-validator';
 
 export class UpdateDropDto {
@@ -18,6 +22,17 @@ export class UpdateDropDto {
   description?: string;
 
   @IsOptional()
-  @IsUrl()
-  image?: string;
+  @IsDateString()
+  startDate?: Date;
+
+  @IsOptional()
+  @IsDateString()
+  endDate?: Date;
+
+  @IsOptional()
+  @Transform(({ value }) => Number(value))
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  totalAmount: number;
 }
