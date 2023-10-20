@@ -2,10 +2,8 @@ import {
   Body,
   Controller,
   Delete,
-  FileTypeValidator,
-  MaxFileSizeValidator,
   Param,
-  ParseFilePipe,
+  ParseFilePipeBuilder,
   Patch,
   Post,
   UploadedFile,
@@ -20,15 +18,12 @@ import { DropIdDto } from './dto/drop-id.dto';
 import { UpdateDropDto } from './dto/update-drop.dto';
 import { GetUser } from '../auth/auth/get-user.decorator';
 import { User } from '../auth/users/user.entity';
-import { IpfsService } from '../ipfs/ipfs.service';
+import { Drop } from './drop.entity';
 
 @Controller('drops')
 @UseGuards(AuthGuard())
 export class DropsController {
-  constructor(
-    private readonly dropsService: DropsService,
-    private readonly ipfsService: IpfsService,
-  ) {}
+  constructor(private readonly dropsService: DropsService) {}
 
   @Post()
   @UseInterceptors(FileInterceptor('image'))
@@ -36,47 +31,73 @@ export class DropsController {
     @Body() createDropDto: CreateDropDto,
     @GetUser() user: User,
     @UploadedFile(
-      new ParseFilePipe({
-        validators: [
-          new MaxFileSizeValidator({ maxSize: 4194304 }),
-          new FileTypeValidator({ fileType: /image\/png|image\/gif/ }),
-        ],
-      }),
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: /image\/png|image\/gif/,
+        })
+        .addMaxSizeValidator({
+          maxSize: 4194304,
+        })
+        .build(),
     )
     image: Express.Multer.File,
-  ) {
+  ): Promise<Drop> {
     const { title, description, startDate, endDate, totalAmount } =
       createDropDto;
-    const { address } = user;
-    const { buffer } = image;
-    const imageUrl = await this.ipfsService.pinBufferToIpfs(buffer);
+    const { address: requestUserAddress } = user;
+    const { buffer: imageBuffer } = image;
     return await this.dropsService.create(
+      requestUserAddress,
       title,
       description,
-      imageUrl,
+      imageBuffer,
       startDate,
       endDate,
       totalAmount,
-      address,
     );
   }
 
-  // @Patch('/:id')
-  // update(
-  //   @Param() dropIdDto: DropIdDto,
-  //   @Body() updateDropDto: UpdateDropDto,
-  //   @GetUser() user: User,
-  // ): Promise<void> {
-  //   const { id } = dropIdDto;
-  //   const { title, description, image } = updateDropDto;
-  //   const { address } = user;
-  //   return this.dropsService.update(id, title, description, image, address);
-  // }
+  @Patch('/:id')
+  @UseInterceptors(FileInterceptor('image'))
+  async update(
+    @Param() dropIdDto: DropIdDto,
+    @Body() updateDropDto: UpdateDropDto,
+    @GetUser() user: User,
+    @UploadedFile(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: /image\/png|image\/gif/,
+        })
+        .addMaxSizeValidator({
+          maxSize: 4194304,
+        })
+        .build({ fileIsRequired: false }),
+    )
+    image?: Express.Multer.File,
+  ): Promise<void> {
+    const { id: dropId } = dropIdDto;
+    const { title, description, startDate, endDate, totalAmount } =
+      updateDropDto;
+    const { address: requestUserAddress } = user;
+    return await this.dropsService.update(
+      dropId,
+      requestUserAddress,
+      title,
+      description,
+      image?.buffer,
+      startDate,
+      endDate,
+      totalAmount,
+    );
+  }
 
   @Delete('/:id')
-  delete(@Param() dropIdDto: DropIdDto, @GetUser() user: User): Promise<void> {
+  async delete(
+    @Param() dropIdDto: DropIdDto,
+    @GetUser() user: User,
+  ): Promise<void> {
     const { id } = dropIdDto;
     const { address } = user;
-    return this.dropsService.delete(id, address);
+    return await this.dropsService.delete(id, address);
   }
 }

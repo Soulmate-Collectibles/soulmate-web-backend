@@ -17,12 +17,12 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  signIn(
+  async signIn(
     address: string,
     message: string,
     signedMessage: string,
-  ): { access_token: string } {
-    const user = this.usersService.getOnePartial(address);
+  ): Promise<{ access_token: string }> {
+    const user = await this.usersService.getOnePartial(address);
     let recoveredAddress: string;
     try {
       recoveredAddress = ethers.verifyMessage(message, signedMessage);

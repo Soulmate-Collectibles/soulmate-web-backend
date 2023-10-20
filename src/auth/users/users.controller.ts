@@ -11,29 +11,29 @@ export class UsersController {
 
   @UseGuards(AuthGuard())
   @Get('/:address')
-  getOne(
+  async getOne(
     @Param() userAddressDto: UserAddressDto,
     @GetUser() user: User,
   ): Promise<User> {
     const { address } = userAddressDto;
     const { address: requestUserAddress } = user;
-    return this.usersService.getOneFull(address, requestUserAddress);
+    return await this.usersService.getOneFull(address, requestUserAddress);
   }
 
   @Get('/:address/nonce')
-  getOneNonce(@Param() userAddressDto: UserAddressDto): Promise<User> {
+  async getOneNonce(@Param() userAddressDto: UserAddressDto): Promise<User> {
     const { address } = userAddressDto;
-    return this.usersService.getOnePartial(address);
+    return await this.usersService.getOnePartial(address);
   }
 
   @UseGuards(AuthGuard())
   @Delete('/:address')
-  delete(
+  async delete(
     @Param() userAddressDto: UserAddressDto,
     @GetUser() user: User,
   ): Promise<void> {
     const { address } = userAddressDto;
     const { address: requestUserAddress } = user;
-    return this.usersService.delete(address, requestUserAddress);
+    return await this.usersService.delete(address, requestUserAddress);
   }
 }

@@ -12,20 +12,23 @@ export class MintlinksController {
   constructor(private readonly mintlinksService: MintlinksService) {}
 
   @Patch('/:id')
-  update(
+  async update(
     @Param() uuidDto: UUIDDto,
     @Body() updateMintlinkDto: UpdateMintlinkDto,
   ): Promise<void> {
     const { id } = uuidDto;
     const { remainingUses } = updateMintlinkDto;
-    return this.mintlinksService.update(id, remainingUses);
+    return await this.mintlinksService.update(id, remainingUses);
   }
 
   @UseGuards(AuthGuard())
   @Get('/:id')
-  getOne(@Param() uuidDto: UUIDDto, @GetUser() user: User): Promise<Mintlink> {
+  async getOne(
+    @Param() uuidDto: UUIDDto,
+    @GetUser() user: User,
+  ): Promise<Mintlink> {
     const { id } = uuidDto;
     const { address } = user;
-    return this.mintlinksService.getOneFull(id, address);
+    return await this.mintlinksService.getOneFull(id, address);
   }
 }

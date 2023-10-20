@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { Drop } from './drop.entity';
 import { MintlinksService } from '../mintlinks/mintlinks.service';
 import { UsersService } from '../auth/users/users.service';
+import { IpfsService } from '../ipfs/ipfs.service';
 
 @Injectable()
 export class DropsService {
@@ -15,25 +16,26 @@ export class DropsService {
     @InjectRepository(Drop) private readonly dropsRepository: Repository<Drop>,
     private readonly mintlinksService: MintlinksService,
     private readonly usersService: UsersService,
+    private readonly ipfsService: IpfsService,
   ) {}
 
   async create(
+    creatorAddress: string,
     title: string,
     description: string,
-    image: string,
+    image: Buffer,
     startDate: Date,
     endDate: Date,
     totalAmount: number,
-    creatorAddress: string,
   ): Promise<Drop> {
+    const imageUrl = await this.ipfsService.pinBufferToIpfs(image);
     const creator = await this.usersService.getOnePartial(creatorAddress);
-    const expiryDate = new Date(endDate);
-    expiryDate.setMonth(expiryDate.getMonth() + 1);
+    const expiryDate = this.dateSumMonth(endDate);
     const mintlink = this.mintlinksService.create(expiryDate, totalAmount);
     const drop = this.dropsRepository.create({
       title,
       description,
-      image,
+      image: imageUrl,
       startDate,
       endDate,
       totalAmount,
@@ -70,13 +72,16 @@ export class DropsService {
 
   async update(
     dropId: string,
-    title: string,
-    description: string,
-    image: string,
     creatorAddress: string,
+    title: string | undefined,
+    description: string | undefined,
+    image: Buffer | undefined,
+    startDate: Date | undefined,
+    endDate: Date | undefined,
+    totalAmout: number | undefined,
   ): Promise<void> {
-    this.notMintedValidation(dropId, creatorAddress);
-    const drop = await this.getOnePartial(dropId, creatorAddress);
+    const drop = await this.getOneFull(dropId, creatorAddress);
+    this.notMintedValidation(drop);
     if (title) {
       drop.title = title;
     }
@@ -84,7 +89,17 @@ export class DropsService {
       drop.description = description;
     }
     if (image) {
-      drop.image = image;
+      drop.image = await this.ipfsService.pinBufferToIpfs(image);
+    }
+    if (startDate) {
+      drop.startDate = startDate;
+    }
+    if (endDate) {
+      drop.endDate = endDate;
+    }
+    if (totalAmout) {
+      drop.totalAmount = totalAmout;
+      drop.mintlinks[0].remainingUses = totalAmout;
     }
     await this.dropsRepository.save(drop);
     return;
@@ -106,22 +121,18 @@ export class DropsService {
     return;
   }
 
-  async notMintedValidation(
-    dropId: string,
-    creatorAddress: string,
-  ): Promise<void> {
-    const drop = await this.dropsRepository
-      .createQueryBuilder('drop')
-      .leftJoin('drop.mintlinks', 'mintlink')
-      .where('drop.id = :dropId', { dropId })
-      .andWhere('drop.creatorAddress = :creatorAddress', { creatorAddress })
-      .andWhere('drop.totalAmount = mintlink.remainingUses');
-
-    if (!drop) {
+  notMintedValidation(fullDrop: Drop): void {
+    if (fullDrop.totalAmount !== fullDrop.mintlinks[0].remainingUses) {
       throw new ConflictException(
-        `Can not perform the operation because the drop has already been minted`,
+        `Can not perform the operation because drop has already been minted`,
       );
     }
     return;
+  }
+
+  dateSumMonth(baseDate: Date): Date {
+    const newDate = new Date(baseDate);
+    newDate.setMonth(newDate.getMonth() + 1);
+    return newDate;
   }
 }

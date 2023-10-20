@@ -34,5 +34,5 @@ export class UpdateDropDto {
   @IsInt()
   @Min(1)
   @Max(100)
-  totalAmount: number;
+  totalAmount?: number;
 }
