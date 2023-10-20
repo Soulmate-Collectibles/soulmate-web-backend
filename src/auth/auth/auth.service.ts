@@ -30,6 +30,8 @@ export class AuthService {
       throw new BadRequestException('Signed message must be a valid signature');
     }
     if (user && recoveredAddress === address) {
+      user.nonce = this.generateNonce();
+      await this.usersService.updateNonce(user);
       const payload: JwtPayload = { sub: address };
       return { access_token: this.jwtService.sign(payload) };
     } else {
