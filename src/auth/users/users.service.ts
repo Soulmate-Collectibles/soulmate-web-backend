@@ -67,6 +67,11 @@ export class UsersService {
     return user;
   }
 
+  async updateNonce(userUpdated: User): Promise<void> {
+    await this.usersRepository.save(userUpdated);
+    return;
+  }
+
   async delete(address: string, requestUserAddress: string): Promise<void> {
     if (requestUserAddress !== address) {
       throw new NotFoundException(`User not found`);
