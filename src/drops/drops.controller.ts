@@ -76,7 +76,7 @@ export class DropsController {
     image?: Express.Multer.File,
   ): Promise<void> {
     const { id: dropId } = dropIdDto;
-    const { title, description, startDate, endDate, totalAmount } =
+    const { title, description, startDate, endDate, totalAmount, confirmed } =
       updateDropDto;
     const { address: requestUserAddress } = user;
     return await this.dropsService.update(
@@ -88,6 +88,7 @@ export class DropsController {
       startDate,
       endDate,
       totalAmount,
+      confirmed,
     );
   }
 

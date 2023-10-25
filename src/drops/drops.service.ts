@@ -39,6 +39,7 @@ export class DropsService {
       startDate,
       endDate,
       totalAmount,
+      confirmed: false,
       creator,
       mintlinks: [mintlink],
     });
@@ -78,28 +79,33 @@ export class DropsService {
     image: Buffer | undefined,
     startDate: Date | undefined,
     endDate: Date | undefined,
-    totalAmout: number | undefined,
+    totalAmount: number | undefined,
+    confirmed: boolean | undefined,
   ): Promise<void> {
     const drop = await this.getOneFull(dropId, creatorAddress);
+
     this.notMintedValidation(drop);
-    if (title) {
-      drop.title = title;
+    this.notConfirmedValidation(drop);
+
+    title ? (drop.title = title) : null;
+
+    description ? (drop.description = description) : null;
+
+    image ? (drop.image = await this.ipfsService.pinBufferToIpfs(image)) : null;
+
+    startDate ? (drop.startDate = startDate) : null;
+
+    endDate ? (drop.endDate = endDate) : null;
+
+    if (totalAmount) {
+      drop.totalAmount = totalAmount;
+      drop.mintlinks[0].remainingUses = totalAmount;
     }
-    if (description) {
-      drop.description = description;
-    }
-    if (image) {
-      drop.image = await this.ipfsService.pinBufferToIpfs(image);
-    }
-    if (startDate) {
-      drop.startDate = startDate;
-    }
-    if (endDate) {
-      drop.endDate = endDate;
-    }
-    if (totalAmout) {
-      drop.totalAmount = totalAmout;
-      drop.mintlinks[0].remainingUses = totalAmout;
+    if (confirmed !== undefined) {
+      if (confirmed === false) {
+        throw new ConflictException('A drop can not be unconfirmed');
+      }
+      drop.confirmed = confirmed;
     }
     await this.dropsRepository.save(drop);
     return;
@@ -125,6 +131,15 @@ export class DropsService {
     if (fullDrop.totalAmount !== fullDrop.mintlinks[0].remainingUses) {
       throw new ConflictException(
         `Can not perform the operation because drop has already been minted`,
+      );
+    }
+    return;
+  }
+
+  notConfirmedValidation(partialDrop: Drop): void {
+    if (partialDrop.confirmed) {
+      throw new ConflictException(
+        `Can not perform the operation because drop has already been confirmed`,
       );
     }
     return;

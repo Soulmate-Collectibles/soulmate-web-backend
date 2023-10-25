@@ -31,6 +31,9 @@ export class Drop {
   @Column()
   totalAmount: number;
 
+  @Column()
+  confirmed: boolean;
+
   @ManyToOne(() => User, (user) => user.drops, { onDelete: 'CASCADE' })
   creator: User;
 

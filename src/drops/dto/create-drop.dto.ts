@@ -27,6 +27,6 @@ export class CreateDropDto {
   @Transform(({ value }) => Number(value))
   @IsInt()
   @Min(1)
-  @Max(100)
+  @Max(40)
   totalAmount: number;
 }
