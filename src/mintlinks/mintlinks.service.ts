@@ -52,6 +52,7 @@ export class MintlinksService {
       mintlink = await this.mintlinksRepository
         .createQueryBuilder('mintlink')
         .leftJoinAndSelect('mintlink.drop', 'drop')
+        .leftJoinAndSelect('drop.creator', 'creator')
         .where('mintlink.id = :id', { id })
         .getOne();
     }
