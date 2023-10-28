@@ -1,6 +1,5 @@
 import { Transform } from 'class-transformer';
 import {
-  IsBoolean,
   IsDateString,
   IsInt,
   IsOptional,
@@ -36,8 +35,4 @@ export class UpdateDropDto {
   @Min(1)
   @Max(100)
   totalAmount?: number;
-
-  @IsOptional()
-  @IsBoolean()
-  confirmed?: boolean;
 }

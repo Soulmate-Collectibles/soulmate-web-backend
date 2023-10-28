@@ -80,11 +80,8 @@ export class DropsService {
     startDate: Date | undefined,
     endDate: Date | undefined,
     totalAmount: number | undefined,
-    confirmed: boolean | undefined,
   ): Promise<void> {
     const drop = await this.getOneFull(dropId, creatorAddress);
-
-    this.notMintedValidation(drop);
     this.notConfirmedValidation(drop);
 
     title ? (drop.title = title) : null;
@@ -101,12 +98,16 @@ export class DropsService {
       drop.totalAmount = totalAmount;
       drop.mintlinks[0].remainingUses = totalAmount;
     }
-    if (confirmed !== undefined) {
-      if (confirmed === false) {
-        throw new ConflictException('A drop can not be unconfirmed');
-      }
-      drop.confirmed = confirmed;
-    }
+
+    await this.dropsRepository.save(drop);
+    return;
+  }
+
+  async confirm(dropId: string, creatorAddress: string): Promise<void> {
+    const drop = await this.getOneFull(dropId, creatorAddress);
+    this.notConfirmedValidation(drop);
+
+    drop.confirmed = true;
     await this.dropsRepository.save(drop);
     return;
   }
