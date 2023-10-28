@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Drop } from './drop.entity';
-import { MintlinksService } from '../mintlinks/mintlinks.service';
+import { MintlinksService } from '../mintlinks/mintlink/mintlinks.service';
 import { UsersService } from '../auth/users/users.service';
 import { IpfsService } from '../ipfs/ipfs.service';
 

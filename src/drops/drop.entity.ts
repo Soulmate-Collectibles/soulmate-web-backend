@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Mintlink } from '../mintlinks/mintlink.entity';
+import { Mintlink } from '../mintlinks/mintlink/mintlink.entity';
 import { User } from '../auth/users/user.entity';
 
 @Entity()

@@ -7,8 +7,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Metadata } from './metadata.interface';
 import { Mintlink } from './mintlink.entity';
-import { Drop } from '../drops/drop.entity';
-import { IpfsService } from '../ipfs/ipfs.service';
+import { Drop } from '../../drops/drop.entity';
+import { IpfsService } from '../../ipfs/ipfs.service';
+import { ContractService } from '../contract/contract.service';
 
 @Injectable()
 export class MintlinksService {
@@ -16,6 +17,7 @@ export class MintlinksService {
     @InjectRepository(Mintlink)
     private readonly mintlinksRepository: Repository<Mintlink>,
     private readonly ipfsService: IpfsService,
+    private readonly contractService: ContractService,
   ) {}
 
   create(expiresAt: Date, remainingUses: number): Mintlink {
@@ -80,11 +82,14 @@ export class MintlinksService {
     this.mintlinkRemainingValidation(mintlink);
     const metadata = this.generateMetadata(mintlink);
     const tokenURI = await this.ipfsService.pinJSONToIpfs(metadata);
-    console.log(tokenURI);
-    // try{
-    //   // firmar transacción
-    // } catch()
-    // mintlink.remainingUses = mintlink.remainingUses - 1;
+    const txHash = await this.contractService.safeMint(
+      receiverAddress,
+      tokenURI,
+    );
+    return {
+      txHash,
+      tokenURI,
+    };
   }
 
   generateMetadata(fullMintlink: Mintlink): Metadata {

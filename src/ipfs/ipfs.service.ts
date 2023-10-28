@@ -1,6 +1,6 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Metadata } from '../mintlinks/metadata.interface';
+import { Metadata } from '../mintlinks/mintlink/metadata.interface';
 import { Readable } from 'stream';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pinataSDK = require('@pinata/sdk');
