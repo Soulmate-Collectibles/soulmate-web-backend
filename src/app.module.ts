@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { DropsModule } from './drops/drops.module';
 import { MintlinksModule } from './mintlinks/mintlinks.module';
 import { IpfsModule } from './ipfs/ipfs.module';
+import { NftGatewayModule } from './nft-gateway/nft-gateway.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { IpfsModule } from './ipfs/ipfs.module';
     DropsModule,
     MintlinksModule,
     IpfsModule,
+    NftGatewayModule,
   ],
 })
 export class AppModule {}

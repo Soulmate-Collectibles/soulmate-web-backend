@@ -64,18 +64,6 @@ export class MintlinksService {
     return mintlink;
   }
 
-  async update(id: string, remainingUses: number): Promise<void> {
-    const mintlink = await this.getOnePartial(id);
-    if (remainingUses >= mintlink.remainingUses) {
-      throw new ConflictException(
-        `Must decrease number of remaining uses. Current value is ${mintlink.remainingUses}`,
-      );
-    }
-    mintlink.remainingUses = remainingUses;
-    await this.mintlinksRepository.save(mintlink);
-    return;
-  }
-
   async mint(mintlinkId: string, receiverAddress: string) {
     const mintlink = await this.getOneFull(mintlinkId);
     this.dropConfirmedValidation(mintlink.drop);
@@ -86,6 +74,8 @@ export class MintlinksService {
       receiverAddress,
       tokenURI,
     );
+    mintlink.remainingUses = mintlink.remainingUses - 1;
+    await this.mintlinksRepository.save(mintlink);
     return {
       txHash,
       tokenURI,

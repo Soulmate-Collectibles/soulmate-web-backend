@@ -1,16 +1,7 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { MintlinksService } from './mintlinks.service';
 import { Mintlink } from './mintlink.entity';
-import { UpdateMintlinkDto } from './dto/update-mintlink.dto';
 import { UUIDDto } from '../../drops/dto/uuid.dto';
 import { GetUser } from '../../auth/auth/get-user.decorator';
 import { User } from '../../auth/users/user.entity';
@@ -19,16 +10,6 @@ import { UserAddressDto } from 'src/auth/users/dto/user-address.dto';
 @Controller('mintlinks')
 export class MintlinksController {
   constructor(private readonly mintlinksService: MintlinksService) {}
-
-  @Patch('/:id')
-  async update(
-    @Param() uuidDto: UUIDDto,
-    @Body() updateMintlinkDto: UpdateMintlinkDto,
-  ): Promise<void> {
-    const { id } = uuidDto;
-    const { remainingUses } = updateMintlinkDto;
-    return await this.mintlinksService.update(id, remainingUses);
-  }
 
   @UseGuards(AuthGuard())
   @Get('/:id')

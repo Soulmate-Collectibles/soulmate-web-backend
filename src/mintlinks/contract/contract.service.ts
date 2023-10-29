@@ -25,7 +25,7 @@ export class ContractService {
   async safeMint(toAddress: string, tokenURI: string) {
     try {
       const tx = await this.contract.safeMint(toAddress, tokenURI);
-      //await tx.wait();
+      await tx.wait();
       return tx.hash;
     } catch (error) {
       console.error(error);
