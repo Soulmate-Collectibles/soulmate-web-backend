@@ -5,7 +5,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Mintlink } from '../mintlinks/mintlink.entity';
+import { Mintlink } from '../mintlinks/mintlink/mintlink.entity';
 import { User } from '../auth/users/user.entity';
 
 @Entity()
@@ -30,6 +30,9 @@ export class Drop {
 
   @Column()
   totalAmount: number;
+
+  @Column()
+  confirmed: boolean;
 
   @ManyToOne(() => User, (user) => user.drops, { onDelete: 'CASCADE' })
   creator: User;

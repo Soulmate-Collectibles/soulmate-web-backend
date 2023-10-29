@@ -91,6 +91,16 @@ export class DropsController {
     );
   }
 
+  @Patch('/:id/confirm')
+  async confirm(
+    @Param() dropIdDto: DropIdDto,
+    @GetUser() user: User,
+  ): Promise<void> {
+    const { id: dropId } = dropIdDto;
+    const { address: requestUserAddress } = user;
+    return await this.dropsService.confirm(dropId, requestUserAddress);
+  }
+
   @Delete('/:id')
   async delete(
     @Param() dropIdDto: DropIdDto,

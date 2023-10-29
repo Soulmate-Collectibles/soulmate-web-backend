@@ -6,7 +6,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Drop } from './drop.entity';
-import { MintlinksService } from '../mintlinks/mintlinks.service';
+import { MintlinksService } from '../mintlinks/mintlink/mintlinks.service';
 import { UsersService } from '../auth/users/users.service';
 import { IpfsService } from '../ipfs/ipfs.service';
 
@@ -39,6 +39,7 @@ export class DropsService {
       startDate,
       endDate,
       totalAmount,
+      confirmed: false,
       creator,
       mintlinks: [mintlink],
     });
@@ -78,29 +79,35 @@ export class DropsService {
     image: Buffer | undefined,
     startDate: Date | undefined,
     endDate: Date | undefined,
-    totalAmout: number | undefined,
+    totalAmount: number | undefined,
   ): Promise<void> {
     const drop = await this.getOneFull(dropId, creatorAddress);
-    this.notMintedValidation(drop);
-    if (title) {
-      drop.title = title;
+    this.notConfirmedValidation(drop);
+
+    title ? (drop.title = title) : null;
+
+    description ? (drop.description = description) : null;
+
+    image ? (drop.image = await this.ipfsService.pinBufferToIpfs(image)) : null;
+
+    startDate ? (drop.startDate = startDate) : null;
+
+    endDate ? (drop.endDate = endDate) : null;
+
+    if (totalAmount) {
+      drop.totalAmount = totalAmount;
+      drop.mintlinks[0].remainingUses = totalAmount;
     }
-    if (description) {
-      drop.description = description;
-    }
-    if (image) {
-      drop.image = await this.ipfsService.pinBufferToIpfs(image);
-    }
-    if (startDate) {
-      drop.startDate = startDate;
-    }
-    if (endDate) {
-      drop.endDate = endDate;
-    }
-    if (totalAmout) {
-      drop.totalAmount = totalAmout;
-      drop.mintlinks[0].remainingUses = totalAmout;
-    }
+
+    await this.dropsRepository.save(drop);
+    return;
+  }
+
+  async confirm(dropId: string, creatorAddress: string): Promise<void> {
+    const drop = await this.getOneFull(dropId, creatorAddress);
+    this.notConfirmedValidation(drop);
+
+    drop.confirmed = true;
     await this.dropsRepository.save(drop);
     return;
   }
@@ -125,6 +132,15 @@ export class DropsService {
     if (fullDrop.totalAmount !== fullDrop.mintlinks[0].remainingUses) {
       throw new ConflictException(
         `Can not perform the operation because drop has already been minted`,
+      );
+    }
+    return;
+  }
+
+  notConfirmedValidation(partialDrop: Drop): void {
+    if (partialDrop.confirmed) {
+      throw new ConflictException(
+        `Can not perform the operation because drop has already been confirmed`,
       );
     }
     return;
