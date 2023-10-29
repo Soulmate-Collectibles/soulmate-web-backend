@@ -4,16 +4,18 @@ import Moralis from 'moralis';
 
 @Injectable()
 export class NftGatewayService {
-  constructor(
-    private readonly configService: ConfigService,
-    private moduleInitialized: boolean = false,
-  ) {}
+  moduleInitialized;
+
+  constructor(private readonly configService: ConfigService) {
+    this.moduleInitialized = false;
+  }
 
   async initMoralis() {
     try {
       await Moralis.start({
         apiKey: this.configService.get('MORALIS_API_KEY'),
       });
+      this.moduleInitialized = true;
     } catch (error) {
       console.error(error);
       throw new InternalServerErrorException('Error getting NFTs');
